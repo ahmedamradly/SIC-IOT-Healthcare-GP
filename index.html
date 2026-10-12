@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IoT Healthcare & Patient Monitoring Platform</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+</head>
+<body>
+  <!-- System Emergency Alert Banner -->
+  <div id="emergency-banner" class="emergency-banner hidden">
+    <span>⚠️ CRITICAL PATIENT HEALTH ALERT DETECTED - ATTENTION REQUIRED</span>
+  </div>
+
+  <div class="dashboard-container">
+    <header>
+      <div class="header-main">
+        <h1>IoT Health & Telemetry Dashboard</h1>
+        <p class="subtitle">Multi-User Physiological Analytics & Wearable Telemetry</p>
+      </div>
+
+      <!-- Active Patient Selector & Device Status -->
+      <div class="header-actions">
+        <div class="patient-select-wrapper">
+          <label for="active-user-select">Active Patient:</label>
+          <select id="active-user-select">
+            <option value="">-- Select Patient --</option>
+          </select>
+        </div>
+        <div class="system-status">
+          <span id="device-status-badge" class="badge offline">Device: Offline</span>
+          <span id="last-update" class="timestamp">Last sync: --</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="grid-layout">
+      <!-- Live Readings -->
+      <section class="card metric-card">
+        <h3>Body / Ambient Temp</h3>
+        <p class="value" id="temp-display">-- °C</p>
+        <span class="subtext">Nominal: 36.5°C - 37.5°C</span>
+      </section>
+
+      <section class="card metric-card">
+        <h3>Heart Rate (BPM)</h3>
+        <p class="value pulse" id="bpm-display">-- BPM</p>
+        <span class="subtext">Nominal: 60 - 100 BPM</span>
+      </section>
+
+      <section class="card metric-card">
+        <h3>SpO2 (Blood Oxygen)</h3>
+        <p class="value" id="spo2-display">-- %</p>
+        <span class="subtext">Nominal: 95% - 100%</span>
+      </section>
+
+      <!-- Wear Status -->
+      <section class="card wear-card">
+        <h3>Wear Status</h3>
+        <div class="wear-status-container">
+          <span id="wear-icon" class="wear-icon">⌚</span>
+          <span id="wear-badge" class="badge-wear not-wearing">Not Wearing</span>
+        </div>
+        <p id="wear-description" class="subtext">Sensor detached or no contact detected.</p>
+      </section>
+
+      <!-- 1. Registered Baseline Condition Card -->
+<section class="card status-summary-card">
+  <h3>Registered Baseline State</h3>
+  <div id="registered-condition-badge" class="condition-badge state-normal">Normal</div>
+  <p id="registered-condition-desc" class="condition-advice">Profile baseline condition on file.</p>
+</section>
+
+<!-- 2. Current Live Health State Card -->
+<section class="card status-summary-card">
+  <h3>Current Health State</h3>
+  <div id="patient-condition-badge" class="condition-badge state-normal">Normal</div>
+  <p id="condition-advice" class="condition-advice">Real-time vitals diagnostic analysis.</p>
+</section>
+
+      <!-- Statistical Analysis Panel for Selected User -->
+      <section class="card stats-card">
+        <div class="card-header-flex">
+          <h3>Patient Analytics</h3>
+          <span id="stats-target-name" class="stats-badge">Global / Device</span>
+        </div>
+        <div class="stats-grid">
+          <div><span>Mean:</span> <strong id="stat-avg">--</strong></div>
+          <div><span>Std Deviation:</span> <strong id="stat-std">--</strong></div>
+          <div><span>Minimum:</span> <strong id="stat-min">--</strong></div>
+          <div><span>Maximum:</span> <strong id="stat-max">--</strong></div>
+        </div>
+      </section>
+
+      <!-- User Historical Chart -->
+      <section class="card chart-card">
+        <div class="chart-header">
+          <h3 id="chart-title">Patient Telemetry Trend</h3>
+          <div class="chart-controls">
+            <button class="chart-tab active" data-metric="temperature">Temperature</button>
+            <button class="chart-tab" data-metric="bpm">Heart Rate</button>
+            <button class="chart-tab" data-metric="spo2">SpO2</button>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="telemetryChart"></canvas>
+        </div>
+      </section>
+
+      <!-- Patient Registration & Directory -->
+      <section class="card user-card">
+        <h3>Add User / Patient Profile</h3>
+        <form id="user-form">
+          <div class="form-row">
+            <input type="text" id="user-name" placeholder="Full Name" required />
+            <input type="number" id="user-age" placeholder="Age" required />
+          </div>
+          <div class="form-row">
+            <select id="user-gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+            <select id="user-baseline-condition">
+              <option value="Normal">Baseline: Normal</option>
+              <option value="Needs Attention">Baseline: Attention</option>
+              <option value="Critical">Baseline: Critical</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-submit">Register Profile</button>
+        </form>
+
+        <div class="user-directory">
+          <h4>Registered Profiles (Click to View)</h4>
+          <ul id="user-list" class="user-list"></ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
